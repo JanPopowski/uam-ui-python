@@ -15,6 +15,8 @@
    - [Zadanie 3: Dynamic Loading](#zadanie-3-dynamic-loading--waits-zamiast-sleep)
    - [Zadanie 4: File Upload](#zadanie-4-file-upload--upload-i-walidacja)
    - [Zadanie 5: Alerts](#zadanie-5-alerts--obsługa-alertconfirmprompt)
+   - [Zadanie 6: POM](#zadanie-6-pom---page-object-model)
+   - [Zadanie 7: Github Actions](#zadanie-7-pipeline---github-actions)
 
 ---
 
