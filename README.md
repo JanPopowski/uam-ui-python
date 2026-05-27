@@ -8,7 +8,8 @@
 2. [Instalacja](#instalacja)
 3. [Uruchamianie testów](#uruchamianie-testów)
 4. [Proponowana struktura katalogów](#proponowana-struktura-katalogów)
-5. [Zadania (5)](#zadania-5)
+5. [Dobre Praktyki](#dobre-praktyki-pom--stabilność-testów)
+6. [Zadania (5)](#zadania-5)
    - [Zadanie 1: Add/Remove Elements](#zadanie-1-addremove-elements--dodawanie-i-usuwanie-elementów)
    - [Zadanie 2: Logowanie](#zadanie-2-logowanie--pozytywny-i-negatywny-scenariusz)
    - [Zadanie 3: Dynamic Loading](#zadanie-3-dynamic-loading--waits-zamiast-sleep)
@@ -29,7 +30,7 @@
 
 ```bash
 python -m pip install --upgrade pip
-pip install pytest pytest-playwright
+pip install pytest pytest-playwright pytest-html
 playwright install
 ```
 
@@ -43,6 +44,11 @@ Uruchomienie wszystkich testów:
 pytest -q
 ```
 
+Komenda do uruchomienia wszystkich testów z generowaniem raportu:
+```
+pytest -q --browser chromium --html=artifacts/report.html --self-contained-html --junitxml=artifacts/junit.xml --tracing retain-on-failure --video retain-on-failure --screenshot only-on-failure     
+```
+
 Przydatne parametry:
 
 ```bash
@@ -54,6 +60,8 @@ pytest --screenshot only-on-failure
 pytest --browser-channel chrome  
 ```
 
+
+
 ---
 
 ## Proponowana struktura katalogów
@@ -62,12 +70,41 @@ Minimalna struktura — jeden plik = jedno zadanie:
 
 ```
 ui_tests/
-  test_01_add_remove_elements.py
-  test_02_login.py
-  test_03_dynamic_loading.py
-  test_04_file_upload.py
-  test_05_alerts.py
+  pages/
+    __init__.py
+    base_page.py
+    add_remove_elements_page.py
+    login_page.py
+    dynamic_loading_page.py
+    upload_page.py
+    alerts_page.py
+
+  tests/
+    test_01_add_remove_elements.py
+    test_01_add_remove_elements_pom.py
+    test_02_login.py
+    test_02_login_pom.py
+    test_03_dynamic_loading.py
+    test_03_dynamic_loading_pom.py
+    test_04_upload.py
+    test_04_upload_pom.py
+    test_05_alerts.py
+    test_05_alerts_pom.py
+
+  conftest.py
+  pytest.ini
+  artifacts/
 ```
+
+---
+
+## Dobre praktyki (POM + stabilność testów)
+
+1. **Zero selektorów w testach** — selektory żyją w POM.
+2. **Akcje i asercje rozdzielone metodami** — np. `add_elements()` oraz `expect_delete_count()`.
+3. **Brak `sleep()`** — używamy `expect(...)` i automatycznych waitów Playwright.
+4. **Stabilne selektory** — preferuj `data-testid` / `get_by_role()` / `get_by_label()` gdy to możliwe.
+5. **Artefakty na fail** — screenshot/trace/wideo znacznie skracają diagnostykę.
 
 ---
 
@@ -130,3 +167,22 @@ ui_tests/
 1. Obsłuż JS Alert (accept).
 2. Obsłuż JS Confirm (dismiss) i zweryfikuj wynik.
 3. Obsłuż JS Prompt (wpisz tekst), zaakceptuj i zweryfikuj wynik.
+
+---
+
+### Zadanie 6: POM - Page Object Model
+
+**Kryteria zaliczenia:**
+1. Wszystkie testy powinny mieć utworzony swój odpowiednik z zastosowaniem wzorca POM
+2. Obie wersje testów zachowane w repozytorium
+
+---
+
+### Zadanie 7: Pipeline - Github Actions
+
+**Kryteria zaliczenia:**
+1. Przygotuj pipeline składający się z kroków:
+   1. Uruchomienie testów bez POM
+   2. Uruchomienie testów z POM
+   3. Zebranie obu raportów z testów i udostępnienie ich do pobrania w Github
+   4. Pipeline można uruchamiać ręcznie
