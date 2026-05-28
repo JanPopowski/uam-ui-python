@@ -1,0 +1,37 @@
+name: UI Tests Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-playwright pytest-html
+        playwright install chromium
+        
+    - name: Run Non-POM Tests
+      run: pytest -q ui_tests/tests/test_0[1-5]_*.py --browser chromium --html=artifacts/report-non-pom.html --self-contained-html
+      continue-on-error: true
+        
+    - name: Run POM Tests
+      run: pytest -q ui_tests/tests/test_0[1-5]_*_pom.py --browser chromium --html=artifacts/report-pom.html --self-contained-html
+      continue-on-error: true
+        
+    - name: Upload Test Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports
+        path: artifacts/
+        retention-days: 7
